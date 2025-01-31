@@ -177,6 +177,41 @@ def excluir_usuario(id_usuario):
     else:
         print(f'Usuário com ID: {id_usuario} não localizado!')
 
+def calcular_multa(data_emprestimo, data_devolucao):
+    prazo = 7 # Prazo para devolução em dias
+    atraso = (data_devolucao - data_emprestimo).days - prazo
+    if atraso > 0:
+        # Aplica uma multa de R$ 1,00 por dia de atraso
+        return atraso * 1.0
+    return 0.0
+
+def registrar_devolucao_com_multa(id_usuario, id_livro):
+    # Obter a data do empréstimo
+    cursor.execute('''
+    SELECT data_emprestimo FROM Emprestimos WHERE id_usuario = ? AND id_livro = ? AND data_devolucao = ? IS NULL
+''', (id_usuario, id_livro))
+    emprestimo = cursor.fetchone()
+    if emprestimo:
+        # Verifica a data do emprestimo
+        data_emprestimo = datetime.strptime(emprestimo[0], '%d/%m/%Y')
+        data_atual = datetime.now()
+        # Calcula multa se houver atraso
+        multa = calcular_multa(data_emprestimo, data_atual)
+        # Atualiza a devolução e a multa
+        data_devolucao = data_atual.strftime('%d/%m/%Y')
+        cursor.execute('''
+        UPDATE Emprestimos SET data_devolucao = ?, multa = ? WHERE id_usuario = ? AND id_livro = ? AND data_devolucao = ? IS NULL
+    ''', (data_devolucao, multa, id_usuario, id_livro))
+        # Atualiza o livro para disponível
+        cursor.execute('''
+        UPDATE Livros SET disponivel = 1 WHERE id = ?
+    ''', (id_livro))
+        conn.commit()
+        print(f'Devolução registrada com sucesso! Multa aplicada de R$ {multa:.2f}')
+    else:
+        print('Empréstimo não encontrado ou já devolvido')
+        
+
 def inserir_livro(titulo, autor, editora, ano_publicacao, disponivel):
     salvar_livro_banco(titulo, autor, editora, ano_publicacao, disponivel)
     print('Livro salvo no banco com sucesso!')

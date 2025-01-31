@@ -36,6 +36,7 @@ def criar_tabelas():
                    id_livro INTEGER,
                    data_emprestimo DATE,
                    data_devolucao DATE,
+                   multa REAL DEFAULT 0.0,
                    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id),
                    FOREIGN KEY (id_livro) REFERENCES Livros(id)
                    )

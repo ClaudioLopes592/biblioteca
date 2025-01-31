@@ -13,7 +13,7 @@ def exibir_menu():
     print("1 - Inserir Livro")
     print("2 - Inserir Usuário")
     print("3 - Inserir Empréstimo")
-    print("4 - Inserir Devolução")
+    print("4 - Registrar Devolução")
     print("5 - Livros Disponiveís")
     print("6 - Buscar Livro Por Título")
     print("7 - Buscar Livro Por Autor")
